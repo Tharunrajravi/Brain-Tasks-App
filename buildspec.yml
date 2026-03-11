@@ -29,24 +29,24 @@ phases:
       - docker tag $ECR_REPO:$IMAGE_TAG $REPOSITORY_URI:$IMAGE_TAG
 
   post_build:
-  commands:
-    - echo "Pushing Docker image"
-    - docker push $REPOSITORY_URI:$IMAGE_TAG
+    commands:
+      - echo "Pushing Docker image"
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
 
-    - echo "Updating kubeconfig"
-    - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      - echo "Updating kubeconfig"
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-    - echo "Showing deployment file"
-    - cat k8s/deployment.yaml
+      - echo "Showing deployment file"
+      - cat k8s/deployment.yaml
 
-    - echo "Applying deployment"
-    - kubectl apply -f k8s/deployment.yaml || true
+      - echo "Applying deployment"
+      - kubectl apply -f k8s/deployment.yaml || true
 
-    - echo "Applying service"
-    - kubectl apply -f k8s/service.yaml || true
+      - echo "Applying service"
+      - kubectl apply -f k8s/service.yaml || true
 
-    - echo "Listing pods"
-    - kubectl get pods
+      - echo "Listing pods"
+      - kubectl get pods
 
 artifacts:
   files:
