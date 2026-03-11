@@ -1,0 +1,36 @@
+version: 0.2
+
+env:
+  variables:
+    AWS_REGION: ap-south-1
+    ECR_REPO: brain-tasks-app
+    IMAGE_TAG: latest
+
+phases:
+  install:
+    commands:
+      - echo Installing dependencies
+      - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.29.0/bin/linux/amd64/kubectl
+      - chmod +x kubectl
+      - mv kubectl /usr/local/bin/
+
+  pre_build:
+    commands:
+      - echo Logging into ECR
+      - ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
+      - aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com
+
+  build:
+    commands:
+      - echo Building Docker image
+      - docker build -t $ECR_REPO .
+      - docker tag $ECR_REPO:$IMAGE_TAG $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+
+  post_build:
+    commands:
+      - echo Pushing image to ECR
+      - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
+      - echo Deploying to EKS
+      - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_REGION
+      - kubectl apply -f k8s/deployment.yaml
+      - kubectl apply -f k8s/service.yaml
