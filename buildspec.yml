@@ -30,22 +30,20 @@ phases:
 
   post_build:
     commands:
-      - echo "Updating kubeconfig"
-      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      - echo "=== Checking caller identity ==="
+      - aws sts get-caller-identity
 
-      - echo "Checking cluster connectivity"
-      - kubectl cluster-info
+      - echo "=== Updating kubeconfig ==="
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME --verbose
 
-      - echo "Checking nodes"
-      - kubectl get nodes
+      - echo "=== Checking kubeconfig ==="
+      - cat /root/.kube/config
 
-      - echo "Checking deployment file"
-      - ls -l k8s/deployment.yaml
-      - cat k8s/deployment.yaml
+      - echo "=== Testing cluster connection ==="
+      - kubectl cluster-info --insecure-skip-tls-verify
 
-      - echo "Applying deployment"
+      - echo "=== Deploying ==="
       - kubectl apply -f k8s/deployment.yaml
-
       - kubectl apply -f k8s/service.yaml
 
 artifacts:
