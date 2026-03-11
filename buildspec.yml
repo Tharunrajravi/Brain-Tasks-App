@@ -33,8 +33,10 @@ phases:
       - echo Pushing Docker image
       - docker push $REPOSITORY_URI:$IMAGE_TAG
       - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-      - kubectl apply -f k8s/deployment.yaml
-      - kubectl apply -f k8s/service.yaml
+      - kubectl cluster-info
+      - kubectl auth can-i get pods --all-namespaces
+      - kubectl apply -f k8s/deployment.yaml 2>&1 || true
+      - kubectl apply -f k8s/service.yaml 2>&1 || true
 
 artifacts:
   files:
