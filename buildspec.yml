@@ -36,6 +36,9 @@ phases:
       - echo Updating kubeconfig
       - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
+      - echo Updating deployment image
+      - sed -i "s|REPLACE_IMAGE|$REPOSITORY_URI:$IMAGE_TAG|g" k8s/deployment.yaml
+
       - echo Deploying to Kubernetes
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
