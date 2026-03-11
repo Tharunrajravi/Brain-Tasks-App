@@ -9,7 +9,7 @@ env:
 phases:
   install:
     commands:
-      - echo Installing dependencies
+      - echo Installing kubectl
       - curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.29.0/bin/linux/amd64/kubectl
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/
@@ -28,9 +28,10 @@ phases:
 
   post_build:
     commands:
-      - echo Pushing image to ECR
+      - echo Pushing Docker image
       - docker push $ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com/$ECR_REPO:$IMAGE_TAG
-      - echo Deploying to EKS
+      - echo Updating kubeconfig
       - aws eks update-kubeconfig --name brain-tasks-cluster --region $AWS_REGION
+      - echo Deploying to EKS
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
