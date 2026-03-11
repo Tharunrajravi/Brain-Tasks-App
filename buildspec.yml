@@ -14,7 +14,6 @@ phases:
       - curl -o kubectl https://amazon-eks.s3.us-west-2.amazonaws.com/1.29.0/2024-01-04/bin/linux/amd64/kubectl
       - chmod +x kubectl
       - mv kubectl /usr/local/bin/kubectl
-      - kubectl version --client
 
   pre_build:
     commands:
@@ -33,14 +32,9 @@ phases:
     commands:
       - echo Pushing Docker image
       - docker push $REPOSITORY_URI:$IMAGE_TAG
-
       - echo Updating kubeconfig
-      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
-
-      - echo Checking cluster access
-      - kubectl get nodes
-
-      - echo Deploying application
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      - echo Deploying application to EKS
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
 
