@@ -34,12 +34,9 @@ phases:
       - docker push $REPOSITORY_URI:$IMAGE_TAG
 
       - echo Updating kubeconfig
-      - aws eks update-kubeconfig \
-        --region $AWS_REGION \
-        --name $CLUSTER_NAME \
-        --role-arn arn:aws:iam::919468641180:role/service-role/codebuild-brain-tasks-app-service-role
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-      - echo Deploying to Kubernetes
+      - echo Deploying application to Kubernetes
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
 
