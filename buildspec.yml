@@ -30,19 +30,9 @@ phases:
 
   post_build:
     commands:
-      - echo "=== Checking caller identity ==="
-      - aws sts get-caller-identity
-
-      - echo "=== Updating kubeconfig ==="
-      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME --verbose
-
-      - echo "=== Checking kubeconfig ==="
-      - cat /root/.kube/config
-
-      - echo "=== Testing cluster connection ==="
-      - kubectl cluster-info --insecure-skip-tls-verify
-
-      - echo "=== Deploying ==="
+      - echo Pushing Docker image
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
 
