@@ -33,9 +33,13 @@ phases:
     commands:
       - echo Pushing Docker image
       - docker push $REPOSITORY_URI:$IMAGE_TAG
+
       - echo Updating kubeconfig
-      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
+      - aws eks update-kubeconfig --name $CLUSTER_NAME --region $AWS_REGION
+
+      - echo Checking cluster access
       - kubectl get nodes
+
       - echo Deploying application
       - kubectl apply -f k8s/deployment.yaml
       - kubectl apply -f k8s/service.yaml
