@@ -30,14 +30,22 @@ phases:
 
   post_build:
     commands:
-      - echo Pushing Docker image
-      - docker push $REPOSITORY_URI:$IMAGE_TAG
-
-      - echo Updating kubeconfig
+      - echo "Updating kubeconfig"
       - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
 
-      - echo Deploying application to Kubernetes
+      - echo "Checking cluster connectivity"
+      - kubectl cluster-info
+
+      - echo "Checking nodes"
+      - kubectl get nodes
+
+      - echo "Checking deployment file"
+      - ls -l k8s/deployment.yaml
+      - cat k8s/deployment.yaml
+
+      - echo "Applying deployment"
       - kubectl apply -f k8s/deployment.yaml
+
       - kubectl apply -f k8s/service.yaml
 
 artifacts:
