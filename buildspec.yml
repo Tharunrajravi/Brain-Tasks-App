@@ -34,10 +34,10 @@ phases:
       - docker push $REPOSITORY_URI:$IMAGE_TAG
 
       - echo Updating kubeconfig
-      - aws eks update-kubeconfig --region $AWS_REGION --name $CLUSTER_NAME
-
-      - echo Updating deployment image
-      - sed -i "s|REPLACE_IMAGE|$REPOSITORY_URI:$IMAGE_TAG|g" k8s/deployment.yaml
+      - aws eks update-kubeconfig \
+        --region $AWS_REGION \
+        --name $CLUSTER_NAME \
+        --role-arn arn:aws:iam::919468641180:role/service-role/codebuild-brain-tasks-app-service-role
 
       - echo Deploying to Kubernetes
       - kubectl apply -f k8s/deployment.yaml
